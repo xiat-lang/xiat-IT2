@@ -205,3 +205,8 @@ __marimo__/
 # Replit
 .replit
 replit.nix
+
+# GH CLI Secrets
+.config/
+.cache/
+.upm/
