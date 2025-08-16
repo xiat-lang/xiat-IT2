@@ -1,0 +1,4 @@
+"abc" a @ comment
+a$a
+
+func("arg", 1)
