@@ -98,14 +98,20 @@ def print_ast(head, ind=0):
         print(' '*ind, (head.type, head.value))
     for c in head.children:
         print_ast(c, ind+2)
+def print_flat(head):
+	if head.type != 'BLOCK':
+		print(head.type, head.value)
+	for c in head.children:
+		if c.type != 'BLOCK':
+			print(c.type, c.value)
 
-
-##def run(tokens):
-##	pass
-
+def run(head):
+	pass
 
 if __name__ == '__main__':
 	program = readf(sys.argv[1])
 	tokens = lexer(program)
 	ast = parse(tokens)
-	print_ast(ast)
+	#print_ast(ast)
+	#print_flat(ast)
+	run(ast)
