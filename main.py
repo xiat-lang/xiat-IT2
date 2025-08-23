@@ -114,11 +114,27 @@ def run(head):
 		if command == expect:
 			return True
 		return False
-	def evalcomp(a):
-		raise Exception("no")
+	def stdoutprintxiat(Node):
+		t = ""
+		j = 0
+		while j < len(Node):
+			t += Node[j].value.replace('"','')
+			j += 1
+		print(t)
+	def evalcomp(N):
+		j = 0
+		t = []
+		while j < len(N):
+			if N[j].type == 'VARPTR':
+				t.append(varibles[N[j+1].value])
+			if N[j].type == 'SIGN' and N[j+1].type == 'SIGN':
+				a, b = t.pop(), N[j+2].value
+				t.append(a == b)
+				j += 2
+			j += 1
+		return t.pop()
 	
 	while i < len(Cchild):
-		print(varibles)
 		if Cchild[i].type == 'SIGN':
 			name = Cchild[i+1]
 			value = Cchild[i+2]
@@ -127,12 +143,19 @@ def run(head):
 		elif Is(Cchild[i].value, 'if'):
 			IfHead = Cchild[i+1]
 			IfBody = Cchild[i+2]
-			if evalcomp(IfHead.value):
-				stack.append(Cchild)
+			if evalcomp(IfHead.children):
+				stack.append((i+3, Cchild))
 				Cchild = IfBody.children
-			i += 2
+				i = -1
+			else:
+				i += 3
+		elif Is(Cchild[i].value, 'print'):
+			stdoutprintxiat(Cchild[i+1].children)
+			i += 1
 		i += 1
-
+		if i >= len(Cchild) and stack:
+			i, Cchild = stack.pop()
+	
 if __name__ == '__main__':
 	program = readf(sys.argv[1])
 	tokens = lexer(program)
