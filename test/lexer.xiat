@@ -1,4 +1,4 @@
-"abc" a @ comment
-a$a
-
-func("arg", 1)
+=a 10;
+if (a == 10){
+    die;
+}

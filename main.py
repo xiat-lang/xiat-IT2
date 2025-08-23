@@ -19,6 +19,7 @@ def lexer(program):
 		elif ch in '}])': return ('BLOCKCLOSE', ch)
 		elif ch in '.,': return ('COMM', ch)
 		elif ch == ';': return ('SEMI', ch)
+		elif ch == '=': return ('SIGN', ch)
 		elif ch == '$': return ('VARPTR', ch)
 		elif ch == '+': return ('PLUS', ch)
 		elif ch == '-': return ('SUBT', ch)
@@ -102,11 +103,35 @@ def print_flat(head):
 	if head.type != 'BLOCK':
 		print(head.type, head.value)
 	for c in head.children:
-		if c.type != 'BLOCK':
-			print(c.type, c.value)
+		print(c.type, c.value)
 
 def run(head):
-	pass
+	varibles = {}
+	i = 0
+	stack = []
+	Cchild = head.children
+	def Is(command, expect):
+		if command == expect:
+			return True
+		return False
+	def evalcomp(a):
+		raise Exception("no")
+	
+	while i < len(Cchild):
+		print(varibles)
+		if Cchild[i].type == 'SIGN':
+			name = Cchild[i+1]
+			value = Cchild[i+2]
+			varibles[name.value] = value.value
+			i += 3
+		elif Is(Cchild[i].value, 'if'):
+			IfHead = Cchild[i+1]
+			IfBody = Cchild[i+2]
+			if evalcomp(IfHead.value):
+				stack.append(Cchild)
+				Cchild = IfBody.children
+			i += 2
+		i += 1
 
 if __name__ == '__main__':
 	program = readf(sys.argv[1])
