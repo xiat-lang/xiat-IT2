@@ -25,6 +25,8 @@ def lexer(program):
 		elif ch == '-': return ('SUBT', ch)
 		elif ch == '*': return ('ASTE', ch)
 		elif ch == '/': return ('SLASH', ch)
+		elif ch == '>': return ('RIGHT', ch)
+		elif ch == '<': return ('LEFT', ch)
 		else: return ('CH', ch)
 	while i < len(program):
 		if program[i] == '\"':
@@ -127,10 +129,22 @@ def run(head):
 		while j < len(N):
 			if N[j].type == 'VARPTR':
 				t.append(varibles[N[j+1].value])
-			if N[j].type == 'SIGN' and N[j+1].type == 'SIGN':
+			elif N[j].type == 'SIGN' and N[j+1].type == 'SIGN':
 				a, b = t.pop(), N[j+2].value
 				t.append(a == b)
 				j += 2
+			elif N[j].type == 'SIGN' and N[j+1].type == 'SUBT':
+				a, b = t.pop(), N[j+2].value
+				t.append(a != b)
+				j += 2
+			elif N[j].type == 'LEFT':
+				a, b = t.pop(), N[j+1].value
+				t.append(str(int(a) < int(b)))
+				j += 1
+			elif N[j].type == 'RIGHT':
+				a, b = t.pop(), N[j+1].value
+				t.append(str(int(a) > int(b)))
+				j += 1
 			j += 1
 		return t.pop()
 	
