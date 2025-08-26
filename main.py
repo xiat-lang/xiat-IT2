@@ -23,9 +23,9 @@ def lexer(program):
             return ('BLOCKCLOSE', ch)
         elif ch in '.,': 
             return ('COMM', ch)
-        elif ch == ';':
+        elif ch == ';': # match case from here?
             return ('SEMI', ch)
-        elif ch == '=': # match case
+        elif ch == '=':
             return ('SIGN', ch)
         elif ch == '$':
             return ('VARPTR', ch)
@@ -83,11 +83,13 @@ def lexer(program):
             if inc_safe():
                 break
             continue
+
+        
             
         else:
             tokens.append(handle(program[i]))
             
-        i += 1
+        inc_safe();
     return tokens
 
 # class NodeCL(collections.UserList):
@@ -101,7 +103,7 @@ class Node:
         self.type = type
         self.value = value
         self.children = []
-    def append(self, child):
+    def append(self, child): # maybe rename to push
         self.children.append(child)
     def pop():
         return self.children.pop()
@@ -109,7 +111,7 @@ class Node:
 def parse(tokens):
     head = Node('ROOT', None)
     # global current, stack
-    stack = [head]
+    stack = [head] # since we only use push & pop, this could be a node...
     current = stack[0]
     # def push(node):
     #     global current, stack
@@ -119,7 +121,14 @@ def parse(tokens):
     # def pop()
     # global current
     #     current = stack.pop()
+    global i
     i = 0
+
+    def inc_safe():
+        global i
+        i += 1
+        return i >= len(tokens)
+    
     while i < len(tokens):
         kind, char = tokens[i][0], tokens[i][1] # zip(*tokens)
         
@@ -132,13 +141,21 @@ def parse(tokens):
         elif kind == 'BLOCKCLOSE':
             current = stack.pop()
 
-        elif kind = 'EQ':
+        elif kind == 'EQ':
             i += 1
             kind, char = tokens[i][0], tokens[i][1]
-            if kind = 'ALNUM':
+            if kind == 'ALNUM':
                 var_name = char
             else:
-                raise Exception("")
+                raise Exception("Currently can only set variables")
+            i += 1
+            tok = tokens[i]
+            var_value = tok # is copying ok here?
+
+            new_node = Node('SETVAR', var_name)
+            new_node.append(Node('ALNUM', var_name)) # make var_name a node, too?
+            new_node.append(var_value) # var_value is a Node
+                             
         # TODO: extend
         
         # elif kind == 'VARPTR':
@@ -161,9 +178,9 @@ def parse(tokens):
         #         raise Exception('Expected = after variable name')
         else:
             current.children.append(Node(kind, char))
-            if current.type == 'SETVAR':
-                current = stack.pop()
+            
         i += 1
+        
     print([(i.type, i.value) for i in stack])
     return head
 
@@ -184,10 +201,12 @@ def run(head):
     i = 0
     stack = []
     Cchild = head.children
-    def Is(command, expect):
+    
+    def Is(command, expect): # return command == expect???
         if command == expect:
             return True
         return False
+        
     def stdoutprintxiat(Node):
         t = ""
         j = 0
@@ -195,10 +214,13 @@ def run(head):
             t += Node[j].value.replace('"','')
             j += 1
         print(t)
+        
     def evalcomp(N):
         j = 0
         t = []
         while j < len(N):
+            # kind, val = N[j].type, N[j].value
+            # nxkind, nxval = N[j+1].type, N[j+1].value
         
             if N[j].type == 'VARPTR':
                 t.append(variables[N[j+1].value])
