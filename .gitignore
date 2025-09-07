@@ -210,3 +210,6 @@ replit.nix
 .config/
 .cache/
 .upm/
+
+#my files since my terminal dont allow copy pasting -firelabs
+*.bloat

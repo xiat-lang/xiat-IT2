@@ -196,25 +196,12 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head):
+def run(head, NoOut=False):
     variables = {}
     i = 0
     stack = []
     Cchild = head.children
     
-    def Is(command, expect): # return command == expect???
-        if command == expect:
-            return True
-        return False
-        
-    def stdoutprintxiat(Node):
-        t = ""
-        j = 0
-        while j < len(Node):
-            t += Node[j].value.replace('"','')
-            j += 1
-        print(t)
-        
     def evalcomp(N):
         j = 0
         t = []
@@ -256,7 +243,7 @@ def run(head):
             variables[name.value] = value.value
             i += 3
             
-        elif Is(Cchild[i].value, 'if'):
+        elif Cchild[i].value == 'if':
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
@@ -266,8 +253,14 @@ def run(head):
             else:
                 i += 3
                 
-        elif Is(Cchild[i].value, 'print'):
-            stdoutprintxiat(Cchild[i+1].children)
+        elif  Cchild[i].value == 'print':
+            t = ""
+            j = 0
+            while j < len(Cchild[i+1].children):
+                t += Cchild[i+1].children[j].value.replace('"','')
+                j += 1
+            if not NoOut:
+                print(t)
             i += 1
             
         i += 1
@@ -290,11 +283,16 @@ if __name__ == '__main__':
 #    print("analyzing lexicons")
     program = readf(sys.argv[1])
     tokens = lexer(program)
-    if '-ott' in flags[1]:
+    if '-vtt' in flags[1]:
         for t in tokens: print(t)
 #    print("parsing")
     ast = parse(tokens)
-    if '-opp' in flags[1]:
+    if '-vsynt' in flags[1]:
         print_ast(ast)
+    if '-vsyfl' in flags[1]:
         print_flat(ast)
-    run(ast)
+    if '-nout' in flags[1]:
+        run(ast, True)
+    else:
+        run(ast)
+
