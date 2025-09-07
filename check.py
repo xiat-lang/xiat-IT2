@@ -9,7 +9,7 @@ def test(command, expect, file=None):
         sys.stdout.write(f"file: {file} matched!\n")
 
 if __name__ == '__main__':    
-    test(["python3", "main.py", "test/lexer.xiat", "-nout", "-vtt"],"('STRLIT', '\"abc\"')\n('ALNUM', 'a')\n('ALNUM', 'a')\n('VARPTR', '$')\n('ALNUM', 'a')\n('ALNUM', 'func')\n('BLOCKOPEN', '(')\n('STRLIT', '\"arg\"')\n('COMM', ',')\n('ALNUM', '1')\n('BLOCKCLOSE', ')')","lexer.xiat")
-    test(["python3", "main.py", "test/parser.xiat", "-nout", "-vsynt"],
+    test(["python3", "main.py", "test/lexer.xiat", "-nout", "--vopt", "tokens"],"('STRLIT', '\"abc\"')\n('ALNUM', 'a')\n('ALNUM', 'a')\n('VARPTR', '$')\n('ALNUM', 'a')\n('ALNUM', 'func')\n('BLOCKOPEN', '(')\n('STRLIT', '\"arg\"')\n('COMM', ',')\n('ALNUM', '1')\n('BLOCKCLOSE', ')')","lexer.xiat")
+    test(["python3", "main.py", "test/parser.xiat", "-nout", "--vopt", "syntaxt"],
     " ('ROOT', None)\n`````` ('STRLIT', '\"HAI\"')\n```````` ('ALNUM', '1')\n```````` ('COMM', ',')\n```````` ('ALNUM', '2')","parser.xiat")    
 
