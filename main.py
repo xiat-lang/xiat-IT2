@@ -181,7 +181,7 @@ def parse(tokens):
             
         i += 1
         
-    print([(i.type, i.value) for i in stack])
+    #print([(i.type, i.value) for i in stack])
     return head
 
 def print_ast(head, ind=0):
@@ -273,16 +273,28 @@ def run(head):
         i += 1
         if i >= len(Cchild) and stack:
             i, Cchild = stack.pop()
-    
+
+def parse_args(args):
+    flag = []
+    for arg in args:
+        if arg[0] == '-':
+            flag.append(arg)
+    return [True, flag]
 if __name__ == '__main__':
-    print("start")
-    print("analyzing lexicons")
+    flags = [False, []]
+    if len(sys.argv) < 2:
+        sys.stderr.write("ERROR: exhasted arguments\n")
+        sys.exit(1)
+    if len(sys.argv) > 2: # more then main.py and file.xiat
+        flags = parse_args(sys.argv[1:])
+#    print("analyzing lexicons")
     program = readf(sys.argv[1])
     tokens = lexer(program)
-    print("parsing")
+    if '-ott' in flags[1]:
+        for t in tokens: print(t)
+#    print("parsing")
     ast = parse(tokens)
-    print("ast:")
-    print_ast(ast)
-    print_flat(ast)
-    print("running")
+    if '-opp' in flags[1]:
+        print_ast(ast)
+        print_flat(ast)
     run(ast)
