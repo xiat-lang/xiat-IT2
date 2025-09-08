@@ -267,7 +267,7 @@ def run(head, NoOut=False):
         if i >= len(Cchild) and stack:
             i, Cchild = stack.pop()
 
-def parse_args(args): # parse_flags
+def parse_flags(args): # parse_flags
     flag = []
     for arg in enumerate(args):
         if arg[1][0] == '-':
@@ -282,13 +282,14 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         raise Exception("Deficient arguments.")
     if len(sys.argv) > 2: # more then main.py and file.xiat
-        flags = parse_args(sys.argv[1:])
+        flags = parse_flags(sys.argv[1:])
     # print("analyzing lexicons")
     program = readf(sys.argv[1])
     tokens = lexer(program)
 
     if '--vopt tokens' in flags[1]:
-        for t in tokens: print(t)
+        for t in tokens:
+            print(t)
     # print("parsing")
     ast = parse(tokens)
 
