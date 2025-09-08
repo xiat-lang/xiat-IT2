@@ -1,0 +1,16 @@
+Usage:
+	python3 main.py FILE [OPTION]...
+	python3 main.py (-h | --help)
+Run the interpreter for xiat-IT2. (See README.md for more)
+
+	--vopt       * Be verbose about a specific option listed below.
+
+		tokens   * Print the tokens and their type linearly
+		syntaxt  * Print the syntax as a tree-ish. The number of backquotes indicates the hierarcy
+		syfl     * Print the syntax linearly.
+
+	--nout       * Do not print. (Useful for --vopt)
+	-h, --help   * Display this help and exit.
+
+Examples:
+	python3 main.py test/ifcomp.xiat
