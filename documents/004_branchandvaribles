@@ -1,0 +1,30 @@
+-- 004 : branch and varibles --
+
+-- branch --
+the following statement is a branch
+`()` or `[]` or `{}`
+thats techncally a branch, (however they are EMPTY branches)
+current as per version (IT2) the following is a if statement (head and body)
+`
+    if (HEAD) {
+        BODY
+    } else {
+        BODY
+    }
+` where HEAD is the condition, BODY is the code.
+HEAD conditions can contain following upcodes:
+(equal) `==` (not equal) `!=` (less) `<` (more) `>` and techncally (varptr, see more on varibles) `$`
+
+-- varibles --
+varibles has 2 ways: writing and reading
+
+writing to varibles is the following:
+=name value;
+where name is varible name, value is the inputed value, if value is the semiclon itself, it will be '???' (basically NULL)
+
+reading a varible is following:
+$name (-> value) 
+where name is varible name (you must delcare it first) and it returns the value of the varible (ence a var pointer)
+
+
+(003 - basic parser view) < .

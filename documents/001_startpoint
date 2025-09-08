@@ -1,0 +1,30 @@
+-- 001: start point --
+
+Hello! welcome to XIAT programming language, this is part 1 of the tutorial.
+first of we must mention this programming language is very niche and not widly used
+so compatibility is low.
+
+-- testing the interpreter --
+after this, run follwing command:
+'python3 check.py'
+should pass all test cases, if not, please report at https://github.com/xiat-lang/xiat-IT2/issues
+then create a file (e.g shob can have file extensions: xiat, xi, xt, xia)
+
+-- getting started --
+first of download the interpreter (if you havent aredy) with should be name 'main.py'
+
+hello world in xiat is very simillar in python:
+`print("Hello, World!);` (hello mom is allowed btw)
+just note semicolons are mandetory
+
+-- documentation format --
+as you can see this documentation is quite different, here what each format means:
+
+between quotes ('') - command line
+between (``) - source code
+between par (()) - notes
+between hiphons (-- text --) - headers / titles / sub titles
+
+we are planning into make both web version and local versions of documentation, 1 by 1 exacly same
+we see you soon on next part! 
+. > (002 - basic lexer view)

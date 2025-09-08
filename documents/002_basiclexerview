@@ -1,0 +1,33 @@
+-- 002 : basic lexer view --
+
+in this documentation we will explore the lexer of xiat programming language
+with is suprisely simple, in (IT-2 VER) the tokens are following:
+(type, value) with exeptions of whitespaces and @ (comment)
+
+-- token types --
+the following token types and their respetive value
+('BLOCKOPEN', \( or \[ or \{)
+('BLOCKCLOSE', \) or \] or \})
+('COMM', . or ,)
+('SEMI', ;)
+('SIGN', =)
+('VARPTR', $)
+('PLUS', +)
+('SUBT', -)
+('ASTE', *)
+('SLASH', /)
+('RIGHT', >)
+('LEFT', <)
+('CH', anything else)
+('STRLIT', \"*\")
+('ALNUM', 0-9 a-z A-Z)
+
+-- how does it tokenize --
+this information might be important to understanding the language
+it separates tokens from each category:
+whitespace / commnets (ignores)
+single character tokens (+-/*><;.,)
+multi character tokens ("hello world", 69420, funny60inmy09)
+this dont invalide any tokens (even invalid like # : or 🎈)
+
+(001 - start point) < . > (003 - basic parser view)
