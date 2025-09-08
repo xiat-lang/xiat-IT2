@@ -206,28 +206,28 @@ def run(head, NoOut=False):
         j = 0
         t = []
         while j < len(N):
-            # kind, val = N[j].type, N[j].value
+            kind, nxkind = N[j].type, N[j+1].type
             # nxkind, nxval = N[j+1].type, N[j+1].value
         
-            if N[j].type == 'VARPTR':
+            if kind == 'VARPTR':
                 t.append(variables[N[j+1].value])
                 
-            elif N[j].type == 'SIGN' and N[j+1].type == 'SIGN':
+            elif kind == 'SIGN' and nxkind == 'SIGN':
                 a, b = t.pop(), N[j+2].value
                 t.append(a == b)
                 j += 2
                 
-            elif N[j].type == 'SIGN' and N[j+1].type == 'SUBT':
+            elif kind == 'SIGN' and nxkind == 'SUBT':
                 a, b = t.pop(), N[j+2].value
                 t.append(a != b)
                 j += 2
                 
-            elif N[j].type == 'LEFT':
-                a, b = t.pop(), N[j+1].value
-                t.append(str(int(a) < int(b)))
+            elif kind == 'LEFT':
+                a, b = t.pop(), N[j+1].value # kinda weird how SETVAR is polish notation, yet these are infix.
+                t.append(str(int(a) < int(b))) # NOTE: error handling
                 j += 1
                 
-            elif N[j].type == 'RIGHT':
+            elif kind == 'RIGHT':
                 a, b = t.pop(), N[j+1].value
                 t.append(str(int(a) > int(b)))
                 j += 1
@@ -269,35 +269,45 @@ def run(head, NoOut=False):
 
 def parse_flags(args): # parse_flags
     flag = []
-    for arg in enumerate(args):
+    for arg in enumerate(args): # list of (val, idx)
         if arg[1][0] == '-':
             if arg[1][1] == '-':
-                flag.append(f"{arg[1]} {args[arg[0] + 1]}")
+                if arg[0] == len(args) - 1:
+                    flag.append(arg[1])
+                else:
+                    flag.append(f"{arg[1]} {args[arg[0] + 1]}")
             else:
-                flag.append(arg[1])
+                for i in arg[1][1:]:
+                    flag.append(f"-{i}")
+        else:
+            flag.append(arg[1])
     return [True, flag]
 
 if __name__ == '__main__':
     flags = [False, []]
     if len(sys.argv) < 2:
-        raise Exception("Deficient arguments.")
-    if len(sys.argv) > 2: # more then main.py and file.xiat
-        flags = parse_flags(sys.argv[1:])
-    # print("analyzing lexicons")
+        raise Exception("Deficient arguments. Try --help?")
+        
+    flags = parse_flags(sys.argv[1:])
+
+    if "--help" in flags[1] or "-h" in flags[1]:
+        print(readf("help.txt")) # DUDE... what if we made a man page for this?
+        exit()
+
     program = readf(sys.argv[1])
     tokens = lexer(program)
 
     if '--vopt tokens' in flags[1]:
         for t in tokens:
             print(t)
-    # print("parsing")
+
     ast = parse(tokens)
 
     if '--vopt syntaxt' in flags[1]:
         print_ast(ast)
-    if '-vsyfl' in flags[1]:
+    if '--vopt syfl' in flags[1]:
         print_flat(ast)
-    if '-nout' in flags[1]:
+    if '--nout' in flags[1]:
         run(ast, True)
     else:
         run(ast)
