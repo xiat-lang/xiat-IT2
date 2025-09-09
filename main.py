@@ -6,6 +6,16 @@ def readf(file):
     with open(file, 'r') as f:
         return f.read()
 
+class Node:
+    def __init__(self, type=None, value=None, initc=[]):
+        self.type = type
+        self.value = value
+        self.children = initc
+    def append(self, child): # maybe rename to push
+        self.children.append(child)
+    def pop():
+        return self.children.pop()
+
 def lexer(program):
     global i
     i = 0
@@ -98,15 +108,6 @@ def lexer(program):
 #         self.value = None
 #         self.data = children
 
-class Node:
-    def __init__(self, type=None, value=None):
-        self.type = type
-        self.value = value
-        self.children = []
-    def append(self, child): # maybe rename to push
-        self.children.append(child)
-    def pop():
-        return self.children.pop()
 
 def parse(tokens):
     head = Node('ROOT', None)
@@ -186,7 +187,7 @@ def parse(tokens):
 
 def print_ast(head, ind=0):
     if head.type != 'BLOCK':
-        print('`' * ind, (head.type, head.value))
+        print('->' * ind, (head.type, head.value))
     for c in head.children:
         print_ast(c, ind + 2)
 
@@ -198,15 +199,20 @@ def print_flat(head):
 
 def run(head, NoOut=False):
     variables = {}
+    functions = {}
     i = 0
     stack = []
-    Cchild = head.children
+    Cchild = head.children # current children
     
     def evalcomp(N):
         j = 0
         t = []
         while j < len(N):
-            kind, nxkind = N[j].type, N[j+1].type
+            kind = N[j].type
+            if j + 1 < len(N):
+                nxkind = N[j+1].type
+            else:
+                nxkind = ""
             # nxkind, nxval = N[j+1].type, N[j+1].value
         
             if kind == 'VARPTR':
@@ -217,7 +223,7 @@ def run(head, NoOut=False):
                 t.append(a == b)
                 j += 2
                 
-            elif kind == 'SIGN' and nxkind == 'SUBT':
+            elif kind == 'SIGN' and nxkind == 'SUBT': # =- ???
                 a, b = t.pop(), N[j+2].value
                 t.append(a != b)
                 j += 2
@@ -252,6 +258,12 @@ def run(head, NoOut=False):
                 i = -1
             else:
                 i += 3
+
+        elif Cchild[i].value == "fc":
+            fcname = Cchild[i + 1]
+            fcargs = Cchild[i + 2]
+            fcbody = Cchild[i + 3]
+            functions[fname] = Node("FUNCTION", fcname, [fcargs, fcbody])
                 
         elif  Cchild[i].value == 'print':
             t = ""
@@ -303,9 +315,9 @@ if __name__ == '__main__':
 
     ast = parse(tokens)
 
-    if '--vopt syntaxt' in flags[1]:
+    if '--vopt syntaxt' in flags[1] or "-v" in flags[1]:
         print_ast(ast)
-    if '--vopt syfl' in flags[1]:
+    if '--vopt syfl' in flags[1] or "-v" in flags[1]:
         print_flat(ast)
     if '--nout' in flags[1]:
         run(ast, True)
