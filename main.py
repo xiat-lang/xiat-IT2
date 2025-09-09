@@ -196,11 +196,11 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head, NoOut=False):
+def run(head, extra={}):
     variables = {}
     functions = {}
     i = 0
-    stack = []
+    stack = [(len(head.children)-3, head.children, 'HEAD')]
     Cchild = head.children
     
     def evalcomp(N):
@@ -235,8 +235,21 @@ def run(head, NoOut=False):
                 
             j += 1
         return t.pop()
-    
+    def print_stack(stack):
+        for i in stack:
+            print("--------------")
+            print(f" {i[0]}:{i[2]}")
+    def debug_trace():
+        if 'debugtrack' in extra:
+                while True:
+                    print_stack(stack)
+                    p = input()
+                    if p == 'i':
+                        break
+                    print("\033[2J\033[H")
+    debug_trace()
     while i < len(Cchild):
+        
         if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
             value = Cchild[i+2]
@@ -247,7 +260,8 @@ def run(head, NoOut=False):
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
-                stack.append((i+3, Cchild))
+                stack.append((i+3, Cchild, 'if'))
+                debug_trace()
                 Cchild = IfBody.children
                 i = -1
             else:
@@ -263,7 +277,7 @@ def run(head, NoOut=False):
                 else:
                     t += Cchild[i+1].children[j].value.replace('"','')
                 j += 1
-            if not NoOut:
+            if not 'nout' in extra:
                 print(t)
             i += 1
         elif Cchild[i].value == 'fc':
@@ -275,12 +289,15 @@ def run(head, NoOut=False):
         elif Cchild[i].value in functions: # TODO: make local varibles possible
             Fhead = functions[Cchild[i].value][0]
             Fbody = functions[Cchild[i].value][1]
-            stack.append((i+2, Cchild))
+            stack.append((i+2, Cchild, f"call {Cchild[i].value}"))
+            debug_trace()
             Cchild = Fbody.children
             i = -1
         i += 1
         if i >= len(Cchild) and stack:
-            i, Cchild = stack.pop()
+            i, Cchild, IgnoreIfNotDebug = stack.pop()
+            if len(stack):
+                debug_trace()
 
 def parse_flags(args): # parse_flags
     flag = []
@@ -307,6 +324,7 @@ if __name__ == '__main__':
 
     if "--help" in flags[1] or "-h" in flags[1]:
         print(readf("help.txt")) # DUDE... what if we made a man page for this?
+        #if you can make man page, then do it -firelabs
         exit()
 
     program = readf(sys.argv[1])
@@ -317,13 +335,15 @@ if __name__ == '__main__':
             print(t)
 
     ast = parse(tokens)
-
+    flag = {}
     if '--vopt syntaxt' in flags[1]:
         print_ast(ast)
     if '--vopt syfl' in flags[1]:
         print_flat(ast)
     if '--nout' in flags[1]:
-        run(ast, True)
-    else:
-        run(ast)
+        flag['nout'] = True
+    if '--de' in flags[1]:
+        flag['debugtrack'] = True
+        flag['nout'] = True # has to be, please edit so its better
+    run(ast, flag)
 
