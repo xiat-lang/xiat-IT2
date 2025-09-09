@@ -198,6 +198,7 @@ def print_flat(head):
 
 def run(head, NoOut=False):
     variables = {}
+    functions = {}
     i = 0
     stack = []
     Cchild = head.children
@@ -236,7 +237,6 @@ def run(head, NoOut=False):
         return t.pop()
     
     while i < len(Cchild):
-    
         if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
             value = Cchild[i+2]
@@ -257,12 +257,27 @@ def run(head, NoOut=False):
             t = ""
             j = 0
             while j < len(Cchild[i+1].children):
-                t += Cchild[i+1].children[j].value.replace('"','')
+                if Cchild[i+1].children[j].value == '$':
+                    t += variables[Cchild[i+1].children[j+1].value].replace('"','')
+                    j += 1
+                else:
+                    t += Cchild[i+1].children[j].value.replace('"','')
                 j += 1
             if not NoOut:
                 print(t)
             i += 1
-            
+        elif Cchild[i].value == 'fc':
+            name = Cchild[i+1]
+            arguments = Cchild[i+2]
+            code = Cchild[i+3]
+            functions[name.value] = (arguments, code)
+            i += 3
+        elif Cchild[i].value in functions: # TODO: make local varibles possible
+            Fhead = functions[Cchild[i].value][0]
+            Fbody = functions[Cchild[i].value][1]
+            stack.append((i+2, Cchild))
+            Cchild = Fbody.children
+            i = -1
         i += 1
         if i >= len(Cchild) and stack:
             i, Cchild = stack.pop()

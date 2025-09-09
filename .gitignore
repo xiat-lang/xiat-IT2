@@ -211,5 +211,7 @@ replit.nix
 .cache/
 .upm/
 
-#my files since my terminal dont allow copy pasting -firelabs
+# personal files -firelabs
 *.bloat
+*.dot.* 
+
