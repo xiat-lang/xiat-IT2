@@ -1,3 +1,18 @@
+
+Table of contents:
+- [Documentation](#documentation)
+	- [Statements](#statements)
+		- [Variables](#variables)
+		- [Branches](#branches)
+	- [Expressions](#expressions)
+		- [Variables](#variables-1)
+		- [Comparisons](#comparisons)
+	- [Interpetation](#interpetation)
+		- [Tokens](#tokens)
+		- [Syntax tree](#syntax-tree)
+		- [Execution](#execution)
+
+
 ## Starting point
 
 Hello! This is the XIAT programming language.

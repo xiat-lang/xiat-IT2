@@ -7,13 +7,13 @@ def readf(file):
         return f.read()
 
 class Node:
-    def __init__(self, type=None, value=None, initc=[]):
+    def __init__(self, type: str = None, value: str = None, initc: list = None):
         self.type = type
         self.value = value
-        self.children = initc
+        self.children = initc if initc is not None else []
     def append(self, child): # maybe rename to push
         self.children.append(child)
-    def pop():
+    def pop(self):
         return self.children.pop()
 
 def lexer(program):
@@ -27,51 +27,51 @@ def lexer(program):
         return i >= len(program)
         
     def handle(ch):
-        if ch in '([{':
-            return ('BLOCKOPEN', ch)
-        elif ch in '}])':
-            return ('BLOCKCLOSE', ch)
-        elif ch in '.,': 
-            return ('COMM', ch)
+        if ch in "([{":
+            return ("BLOCKOPEN", ch)
+        elif ch in "}])":
+            return ("BLOCKCLOSE", ch)
+        elif ch in ".,": 
+            return ("COMM", ch)
         elif ch == ';': # match case from here?
-            return ('SEMI', ch)
+            return ("SEMI", ch)
         elif ch == '=':
-            return ('SIGN', ch)
+            return ("SIGN", ch)
         elif ch == '$':
-            return ('VARPTR', ch)
+            return ("VARPTR", ch)
         elif ch == '+':
-            return ('PLUS', ch)
+            return ("PLUS", ch)
         elif ch == '-':
-            return ('SUBT', ch)
+            return ("SUBT", ch)
         elif ch == '*':
-            return ('ASTE', ch)
+            return ("ASTE", ch)
         elif ch == '/':
-            return ('SLASH', ch)
+            return ("SLASH", ch)
         elif ch == '>':
-            return ('RIGHT', ch)
+            return ("RIGHT", ch)
         elif ch == '<':
-            return ('LEFT', ch)
+            return ("LEFT", ch)
         else:
-            return ('CH', ch)
+            return ("CH", ch)
         
     while i < len(program):
     
-        if program[i] == '\"':
+        if program[i] == "\"":
             # add string to tokens
             temp = '"'
             
             while i < len(program):
                 if inc_safe():
-                    raise Exception('Unclosed string')
+                    raise Exception("Unclosed string")
                 if program[i] == '"':
                     temp += '"'
                     break
                 temp += program[i]
-            tokens.append(('STRLIT', temp))
+            tokens.append(("STRLIT", temp))
             
         elif program[i] == '@':
             while i < len(program):
-                if program[i] == '\n':
+                if program[i] == "\n":
                     break
                 i += 1
                 
@@ -87,7 +87,7 @@ def lexer(program):
                     tokens.append(temp)
                     file_ended = True
                     break
-            tokens.append(('ALNUM', temp))
+            tokens.append(("ALNUM", temp))
             
         elif program[i].isspace():
             if inc_safe():
@@ -110,7 +110,7 @@ def lexer(program):
 
 
 def parse(tokens):
-    head = Node('ROOT', None)
+    head = Node("ROOT", None)
     # global current, stack
     stack = [head] # since we only use push & pop, this could be a node...
     current = stack[0]
@@ -133,19 +133,19 @@ def parse(tokens):
     while i < len(tokens):
         kind, char = tokens[i][0], tokens[i][1] # zip(*tokens)
         
-        if kind == 'BLOCKOPEN':
-            new_node = Node('BLOCK', char)
+        if kind == "BLOCKOPEN":
+            new_node = Node("BLOCK", char)
             current.children.append(new_node)
             stack.append(current)
             current = new_node # link
             
-        elif kind == 'BLOCKCLOSE':
+        elif kind == "BLOCKCLOSE":
             current = stack.pop()
 
-        elif kind == 'EQ':
+        elif kind == "EQ":
             i += 1
             kind, char = tokens[i][0], tokens[i][1]
-            if kind == 'ALNUM':
+            if kind == "ALNUM":
                 var_name = char
             else:
                 raise Exception("Currently can only set variables")
@@ -153,30 +153,30 @@ def parse(tokens):
             tok = tokens[i]
             var_value = tok # is copying ok here?
 
-            new_node = Node('SETVAR', var_name)
-            new_node.append(Node('ALNUM', var_name)) # make var_name a node, too?
+            new_node = Node("SETVAR", var_name)
+            new_node.append(Node("ALNUM", var_name)) # make var_name a node, too?
             new_node.append(var_value) # var_value is a Node
                              
         # TODO: extend
         
-        # elif kind == 'VARPTR':
+        # elif kind == "VARPTR":
         #     i += 1
         #     kind, char = tokens[i][0], tokens[i][1]
-        #     if kind == 'ALNUM':
+        #     if kind == "ALNUM":
         #         var_name = char
         #     else:
-        #         current.append(Node('VARPTR', '$'))
+        #         current.append(Node("VARPTR", "$"))
         #         continue
         #     i += 1
         #     kind, char = tokens[i][0], tokens[i][1]
-        #     if kind == 'EQ':
-        #         new_node = Node('SETVAR', char)
+        #     if kind == "EQ":
+        #         new_node = Node("SETVAR", char)
         #         current.children.append(new_node)
         #         stack.append(current)
         #         current = new_node # link
-        #         current.append(Node('VAR', var_name))
+        #         current.append(Node("VAR", var_name))
         #     else:
-        #         raise Exception('Expected = after variable name')
+        #         raise Exception("Expected = after variable name")
         else:
             current.children.append(Node(kind, char))
             
@@ -186,18 +186,18 @@ def parse(tokens):
     return head
 
 def print_ast(head, ind=0):
-    if head.type != 'BLOCK':
-        print('->' * ind, (head.type, head.value))
+    if head.type != "BLOCK":
+        print("->" * ind, (head.type, head.value))
     for c in head.children:
         print_ast(c, ind + 2)
 
 def print_flat(head):
-    if head.type != 'BLOCK':
+    if head.type != "BLOCK":
         print(head.type, head.value)
     for c in head.children:
         print(c.type, c.value)
 
-def run(head, NoOut=False):
+def run(head, vo_nout=False):
     variables = {}
     functions = {}
     i = 0
@@ -215,25 +215,25 @@ def run(head, NoOut=False):
                 nxkind = ""
             # nxkind, nxval = N[j+1].type, N[j+1].value
         
-            if kind == 'VARPTR':
+            if kind == "VARPTR":
                 t.append(variables[N[j+1].value])
                 
-            elif kind == 'SIGN' and nxkind == 'SIGN':
+            elif kind == "SIGN" and nxkind == "SIGN":
                 a, b = t.pop(), N[j+2].value
                 t.append(a == b)
                 j += 2
                 
-            elif kind == 'SIGN' and nxkind == 'SUBT': # =- ???
+            elif kind == "SIGN" and nxkind == "SUBT": # =- ???
                 a, b = t.pop(), N[j+2].value
                 t.append(a != b)
                 j += 2
                 
-            elif kind == 'LEFT':
+            elif kind == "LEFT":
                 a, b = t.pop(), N[j+1].value # kinda weird how SETVAR is polish notation, yet these are infix.
                 t.append(str(int(a) < int(b))) # NOTE: error handling
                 j += 1
                 
-            elif kind == 'RIGHT':
+            elif kind == "RIGHT":
                 a, b = t.pop(), N[j+1].value
                 t.append(str(int(a) > int(b)))
                 j += 1
@@ -243,13 +243,13 @@ def run(head, NoOut=False):
     
     while i < len(Cchild):
     
-        if Cchild[i].type == 'SIGN':
+        if Cchild[i].type == "SIGN":
             name = Cchild[i+1]
             value = Cchild[i+2]
             variables[name.value] = value.value
             i += 3
             
-        elif Cchild[i].value == 'if':
+        elif Cchild[i].value == "if":
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
@@ -260,20 +260,35 @@ def run(head, NoOut=False):
                 i += 3
 
         elif Cchild[i].value == "fc":
-            fcname = Cchild[i + 1]
-            fcargs = Cchild[i + 2]
-            fcbody = Cchild[i + 3]
-            functions[fname] = Node("FUNCTION", fcname, [fcargs, fcbody])
-                
-        elif  Cchild[i].value == 'print':
+            fcname: str = Cchild[i + 1].value
+            fcargs: Node = Cchild[i + 2]
+            fcbody: Node = Cchild[i + 3]
+            functions[fcname] = Node("FUNCTION", fcname, [fcargs, fcbody])
+
+        elif Cchild[i].value == "print":
             t = ""
             j = 0
             while j < len(Cchild[i+1].children):
-                t += Cchild[i+1].children[j].value.replace('"','')
+                t += Cchild[i+1].children[j].value.replace('"', '')
                 j += 1
-            if not NoOut:
+            if not vo_nout:
                 print(t)
             i += 1
+        
+        elif Cchild[i].value in functions:
+            func = functions[Cchild[i].value]
+            fargs = func.children[0].children
+            fbody = func.children[1].children
+            callargs = Cchild[i+1].children
+            if len(fargs) != len(callargs):
+                raise Exception(f"Function {func.value} expects {len(fargs)} arguments,\
+                    got {callargs} ({len(callargs)} arguments)")
+            # set args
+            for j in range(len(fargs)):
+                variables[fargs[j].value] = callargs[j].value
+            stack.append((i+2, Cchild))
+            Cchild = fbody
+            i = -1
             
         i += 1
         if i >= len(Cchild) and stack:
@@ -295,7 +310,7 @@ def parse_flags(args): # parse_flags
             flag.append(arg[1])
     return [True, flag]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     flags = [False, []]
     if len(sys.argv) < 2:
         raise Exception("Deficient arguments. Try --help?")
@@ -309,17 +324,17 @@ if __name__ == '__main__':
     program = readf(sys.argv[1])
     tokens = lexer(program)
 
-    if '--vopt tokens' in flags[1]:
+    if "--vopt tokens" in flags[1]:
         for t in tokens:
             print(t)
 
     ast = parse(tokens)
 
-    if '--vopt syntaxt' in flags[1] or "-v" in flags[1]:
+    if "--vopt syntaxt" in flags[1] or "-v" in flags[1]:
         print_ast(ast)
-    if '--vopt syfl' in flags[1] or "-v" in flags[1]:
+    if "--vopt syfl" in flags[1] or "-v" in flags[1]:
         print_flat(ast)
-    if '--nout' in flags[1]:
+    if "--nout" in flags[1]:
         run(ast, True)
     else:
         run(ast)
