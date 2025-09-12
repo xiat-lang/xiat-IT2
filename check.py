@@ -1,11 +1,11 @@
 import subprocess
 import sys
 
-def test(command, expect, file=None):
+def test(command: str, expect: str, file: str = None):
     result = subprocess.run(command, capture_output=True, text=True)
     # assert result.stdout.strip() != expect.strip(), f"command: {file} dint match expected:\n{expect}\nbut got:\n{result.stdout}"
     if result.stdout.strip() != expect.strip():
-        print(f"""\
+        print(f"""
 command: {file}
 was expected to match:
 {expect}

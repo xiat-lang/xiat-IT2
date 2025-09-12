@@ -1,5 +1,11 @@
 
-Table of contents:
+# Table of contents:
+
+- [Table of contents:](#table-of-contents)
+- [Starting point](#starting-point)
+	- [Testing, testing, 1, 2, 3...](#testing-testing-1-2-3)
+	- [First program](#first-program)
+		- [Background proccesses](#background-proccesses)
 - [Documentation](#documentation)
 	- [Statements](#statements)
 		- [Variables](#variables)
@@ -13,7 +19,7 @@ Table of contents:
 		- [Execution](#execution)
 
 
-## Starting point
+# Starting point
 
 Hello! This is the XIAT programming language.
 Specifically, the second iteration, written in Python 3.0.
@@ -21,7 +27,7 @@ It is currently a work in progress, and contributions are recommended.
 Any reports should be directed to [here](https://github.com/xiat-lang/xiat-IT2/issues).
 There is an HTML version of this Markdown coming soon (and maybe a man page).
 
-### Testing, testing, 1, 2, 3...
+## Testing, testing, 1, 2, 3...
 You can check the interpreter by running:
 ```
 python3 check.py
