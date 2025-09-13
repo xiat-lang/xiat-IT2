@@ -190,6 +190,7 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
+<<<<<<< HEAD
 def run(head: Node, vo_nout=False):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
@@ -198,6 +199,16 @@ def run(head: Node, vo_nout=False):
     Cchild: Node = head.children # current children
 
     def evalcomp(N: list[Node]):
+=======
+def run(head, NoOut=False):
+    variables = {}
+    functions = {}
+    i = 0
+    stack = []
+    Cchild = head.children
+    
+    def evalcomp(N):
+>>>>>>> parent of 2377218 (broke some things, but stack trace added)
         j = 0
         t: list[str] = []
         while j < len(N):
@@ -235,8 +246,12 @@ def run(head: Node, vo_nout=False):
         return t.pop()
     
     while i < len(Cchild):
+<<<<<<< HEAD
     
         if Cchild[i].type == "SIGN":
+=======
+        if Cchild[i].type == 'SIGN':
+>>>>>>> parent of 2377218 (broke some things, but stack trace added)
             name = Cchild[i+1]
             value = Cchild[i+2]
             variables[name.value] = value.value
@@ -264,6 +279,7 @@ def run(head: Node, vo_nout=False):
             while j < len(Cchild[i+1].children):
                 t += Cchild[i+1].children[j].value.replace('"', '')
                 j += 1
+<<<<<<< HEAD
             if not vo_nout:
                 print(t)
             i += 1
@@ -283,6 +299,23 @@ def run(head: Node, vo_nout=False):
             Cchild = fbody
             i = -1 # will become 0 at the end of the loop
             
+=======
+            if not NoOut:
+                print(t)
+            i += 1
+        elif Cchild[i].value == 'fc':
+            name = Cchild[i+1]
+            arguments = Cchild[i+2]
+            code = Cchild[i+3]
+            functions[name.value] = (arguments, code)
+            i += 3
+        elif Cchild[i].value in functions: # TODO: make local varibles possible
+            Fhead = functions[Cchild[i].value][0]
+            Fbody = functions[Cchild[i].value][1]
+            stack.append((i+2, Cchild))
+            Cchild = Fbody.children
+            i = -1
+>>>>>>> parent of 2377218 (broke some things, but stack trace added)
         i += 1
         if i >= len(Cchild) and stack:
             i, Cchild = stack.pop()
@@ -323,11 +356,19 @@ if __name__ == "__main__":
 
     ast = parse(tokens)
 
+<<<<<<< HEAD
     if "--vopt syntaxt" in flags[1] or "-v" in flags[1]:
         print_ast(ast)
     if "--vopt syfl" in flags[1] or "-v" in flags[1]:
         print_flat(ast)
     if "--nout" in flags[1]:
+=======
+    if '--vopt syntaxt' in flags[1]:
+        print_ast(ast)
+    if '--vopt syfl' in flags[1]:
+        print_flat(ast)
+    if '--nout' in flags[1]:
+>>>>>>> parent of 2377218 (broke some things, but stack trace added)
         run(ast, True)
     else:
         run(ast)
