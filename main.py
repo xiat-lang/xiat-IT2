@@ -21,12 +21,12 @@ def lexer(program):
     i = 0
     tokens = []
     
-    def inc_safe():
+    def inc_safe() -> bool:
         global i
         i += 1
         return i >= len(program)
-        
-    def handle(ch):
+
+    def handle(ch: str) -> tuple[str, str]:
         if ch in "([{":
             return ("BLOCKOPEN", ch)
         elif ch in "}])":
@@ -93,13 +93,11 @@ def lexer(program):
             if inc_safe():
                 break
             continue
-
-        
             
         else:
             tokens.append(handle(program[i]))
             
-        inc_safe();
+        inc_safe()
     return tokens
 
 # class NodeCL(collections.UserList):
@@ -112,7 +110,7 @@ def lexer(program):
 def parse(tokens):
     head = Node("ROOT", None)
     # global current, stack
-    stack = [head] # since we only use push & pop, this could be a node...
+    stack: list[Node] = [head] # since we only use push & pop, this could be a node...
     current = stack[0]
     # def push(node):
     #     global current, stack
@@ -124,11 +122,6 @@ def parse(tokens):
     #     current = stack.pop()
     global i
     i = 0
-
-    def inc_safe():
-        global i
-        i += 1
-        return i >= len(tokens)
     
     while i < len(tokens):
         kind, char = tokens[i][0], tokens[i][1] # zip(*tokens)
@@ -197,16 +190,16 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head, vo_nout=False):
-    variables = {}
-    functions = {}
-    i = 0
-    stack = []
-    Cchild = head.children # current children
-    
-    def evalcomp(N):
+def run(head: Node, vo_nout=False):
+    variables: dict[str, str] = {}
+    functions: dict[str, Node] = {}
+    i: int = 0
+    stack: list[Node] = []
+    Cchild: Node = head.children # current children
+
+    def evalcomp(N: list[Node]):
         j = 0
-        t = []
+        t: list[str] = []
         while j < len(N):
             kind = N[j].type
             if j + 1 < len(N):
@@ -276,10 +269,10 @@ def run(head, vo_nout=False):
             i += 1
         
         elif Cchild[i].value in functions:
-            func = functions[Cchild[i].value]
-            fargs = func.children[0].children
-            fbody = func.children[1].children
-            callargs = Cchild[i+1].children
+            func: Node = functions[Cchild[i].value]
+            fargs: list[Node] = func.children[0].children
+            fbody: list[Node] = func.children[1].children
+            callargs: list[Node] = Cchild[i+1].children
             if len(fargs) != len(callargs):
                 raise Exception(f"Function {func.value} expects {len(fargs)} arguments,\
                     got {callargs} ({len(callargs)} arguments)")
@@ -288,7 +281,7 @@ def run(head, vo_nout=False):
                 variables[fargs[j].value] = callargs[j].value
             stack.append((i+2, Cchild))
             Cchild = fbody
-            i = -1
+            i = -1 # will become 0 at the end of the loop
             
         i += 1
         if i >= len(Cchild) and stack:
@@ -311,7 +304,7 @@ def parse_flags(args): # parse_flags
     return [True, flag]
 
 if __name__ == "__main__":
-    flags = [False, []]
+    flags: list[bool, list[str]] = [False, []]
     if len(sys.argv) < 2:
         raise Exception("Deficient arguments. Try --help?")
         
