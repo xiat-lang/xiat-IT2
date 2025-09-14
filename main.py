@@ -198,6 +198,7 @@ def print_flat(head):
 
 def run(head, extra={}):
     variables = {}
+    localvar = {}
     functions = {}
     i = 0
     stack = [(len(head.children)-3, head.children, 'HEAD')]
@@ -211,8 +212,10 @@ def run(head, extra={}):
             # nxkind, nxval = N[j+1].type, N[j+1].value
         
             if kind == 'VARPTR':
-                t.append(variables[N[j+1].value])
-                
+                if N[j+1].value in variables:
+                    t.append(variables[N[j+1].value])
+                elif N[j+1].value in localvar:
+                    t.append(localvar[N[j+1].value])
             elif kind == 'SIGN' and nxkind == 'SIGN':
                 a, b = t.pop(), N[j+2].value
                 t.append(a == b)
@@ -239,28 +242,55 @@ def run(head, extra={}):
         for i in stack:
             print("--------------")
             print(f" {i[0]}:{i[2]}")
+    def print_var(varibles, Localvar, current):
+        print('-- var --')
+        for v in varibles:
+            print(f'{v} {variables[v]}')
+        for lv in Localvar:
+            print(f'{current}: {lv} {Localvar[lv]}');
     def debug_trace():
         if 'debugtrack' in extra:
                 while True:
                     print_stack(stack)
+                    print_var(variables, localvar, stack[-1][0])
                     p = input()
                     if p == 'i':
                         break
                     print("\033[2J\033[H")
+                for v in variables:
+                    print(f'{v} {variables[v]}')
+    def Parse_value(head, body):
+        if head.value != '[': return head.value
+        tmp = []
+        t = []
+        for val in body:
+            if val.type == 'SEMI':
+                tmp.append(t)
+                t = []
+            else:
+                t.append(val)
+        N = Node('VAR', 'ARPRR')
+        N.children = tmp
+        return N
     debug_trace()
     while i < len(Cchild):
         
         if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
-            value = Cchild[i+2]
-            variables[name.value] = value.value
+            value = Parse_value(Cchild[i+2], Cchild[i+2].children)
+            print_ast(value)
+            return
+            if len(stack) == 1:
+                variables[name.value] = value
+            else:
+                localvar[name.value] = value
             i += 3
             
         elif Cchild[i].value == 'if':
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
-                stack.append((i+3, Cchild, 'if'))
+                stack.append((i+3, Cchild, 'if', localvar))
                 debug_trace()
                 Cchild = IfBody.children
                 i = -1
@@ -271,8 +301,8 @@ def run(head, extra={}):
             t = ""
             j = 0
             while j < len(Cchild[i+1].children):
-                if Cchild[i+1].children[j].value == '$':
-                    t += variables[Cchild[i+1].children[j+1].value].replace('"','')
+                if Cchild[i+1].children[j].value == '$': #note: NO is our null
+                    t += variables[Cchild[i+1].children[j+1].value].replace('"','') if variables[Cchild[i+1].children[j+1].value] else 'no'
                     j += 1
                 else:
                     t += Cchild[i+1].children[j].value.replace('"','')
@@ -289,13 +319,14 @@ def run(head, extra={}):
         elif Cchild[i].value in functions: # TODO: make local varibles possible
             Fhead = functions[Cchild[i].value][0]
             Fbody = functions[Cchild[i].value][1]
-            stack.append((i+2, Cchild, f"call {Cchild[i].value}"))
+            stack.append((i+2, Cchild, f"call {Cchild[i].value}", localvar))
+            localvar = {}
             debug_trace()
             Cchild = Fbody.children
             i = -1
         i += 1
         if i >= len(Cchild) and stack:
-            i, Cchild, IgnoreIfNotDebug = stack.pop()
+            i, Cchild, IgnoreIfNotDebug, localvar = stack.pop()
             if len(stack):
                 debug_trace()
 
