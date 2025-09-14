@@ -1,0 +1,11 @@
+=x 2;
+fc aa (){
+	=x 3;
+}
+if($x == 2){
+	print("x is 2");
+}
+aa();
+if($x == 3){
+	print("x is 3");
+}

@@ -120,20 +120,20 @@ procedure, where external procceses are ran throughit.
 Tokens are stored in an ordered pair as `('TOKENNAME', ch)`.
 Here is the EBNF of the tokens, lowercase:
 ```
-strlit = '"', ? Anything except '"' ?,'"';
+strlit = '"', ? Anything except '"' ?, '"';
 alnum = ? /[:alnum:]/ in RegEx ?+;
 blockopen = '[' | '(' | '{';
 blockclose = ']' | ')' | '}';
 comm = '.' | ',';
 semi = ';';
-sign = '=';
+equal = '=';
 varptr = '$';
 plus = '+';
-subt = '-';
-aste = '*';
+minus = '-';
+star = '*';
 slash = '/';
-right = '>';
-left = '<';
+cright = '>';
+cleft = '<';
 ```
 The `'CH'` token is the general character token.
 

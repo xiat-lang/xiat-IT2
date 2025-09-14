@@ -261,10 +261,8 @@ def run(head: Node, vo_nout=False):
 
         elif Cchild[i].value == "print":
             t = ""
-            j = 0
-            while j < len(Cchild[i+1].children):
-                t += Cchild[i+1].children[j].value.replace('"', '')
-                j += 1
+            for j in Cchild[i + 1].children:
+                t += j.value.replace('"', '')
             if not vo_nout:
                 print(t)
             i += 1
@@ -284,27 +282,19 @@ def run(head: Node, vo_nout=False):
 #             Cchild = fbody
 #             i = -1 # will become 0 at the end of the loop
 # =======
-            if not vo_nout:
-                print(t)
-            i += 1
 
-        elif Cchild[i].value == 'fc':
-            name = Cchild[i+1]
-            arguments = Cchild[i+2]
-            code = Cchild[i+3]
-            functions[name.value] = (arguments, code)
-            i += 3
-
-        elif Cchild[i].value in functions: # TODO: make local varibles possible
-            Fhead = functions[Cchild[i].value][0]
-            Fbody = functions[Cchild[i].value][1]
+        elif Cchild[i].value in functions: # TODO: make local variables possible
+            fcargs = functions[Cchild[i].value].children[0].children
+            fcbody = functions[Cchild[i].value].children[1].children
             stack.append((i+2, Cchild))
-            Cchild = Fbody.children
+            Cchild = fcbody
+            for j, arg in enumerate(fcargs):
+                variables[arg.value] = Cchild[i+1].children[j].value
             i = -1
 # >>>>>>> parent of 2377218 (broke some things, but stack trace added)
 
         i += 1
-        if i >= len(Cchild) and stack:
+        if i >= len(Cchild) and len(stack) > 0:
             i, Cchild = stack.pop()
 
 def parse_flags(args): # parse_flags
@@ -337,7 +327,7 @@ if __name__ == "__main__":
     program = readf(sys.argv[1])
     tokens = lexer(program)
 
-    if "--vopt tokens" in flags[1]:
+    if "--vopt tokens" in flags[1] or "-v" in flags[1]:
         for t in tokens:
             print(t)
 

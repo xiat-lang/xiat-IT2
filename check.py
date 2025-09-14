@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import main
 
 def test(command: str, expect: str, file: str = None):
     result = subprocess.run(command, capture_output=True, text=True)
@@ -11,6 +12,20 @@ was expected to match:
 {expect}
 but got:
 {result.stdout}""",
+        file=sys.stderr)
+    else:
+        print(f"file {file} matched!")
+        
+def test2(file: str, expect: str): # uses import module main
+    sys.argv = ["main.py", file, "--nout", "--vopt", "tokens"]
+    result = main.main()
+    if result.strip() != expect.strip():
+        print(f"""
+command: {file}
+was expected to match:
+{expect}
+but got:
+{result}""",
         file=sys.stderr)
     else:
         print(f"file {file} matched!")
