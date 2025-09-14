@@ -190,11 +190,11 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head: Node, vo_nout=False):
+def run(head: Node, vo_nout=False, extra={}):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
     i: int = 0
-    stack: list[Node] = []
+    stack: list[(int, Node, str)] = [(len(head.children)-3, head.children, 'HEAD')] # (index, children, context)
     Cchild: Node = head.children # current children
 
     def evalcomp(N: list[Node]):
@@ -233,9 +233,21 @@ def run(head: Node, vo_nout=False):
                 
             j += 1
         return t.pop()
-    
+    def print_stack(stack):
+        for i in stack:
+            print("--------------")
+            print(f" {i[0]}:{i[2]}")
+    def debug_trace():
+        if 'debugtrack' in extra:
+                while True:
+                    print_stack(stack)
+                    p = input()
+                    if p == 'i':
+                        break
+                    print("\033[2J\033[H")
+    debug_trace()
     while i < len(Cchild):
-        
+    
         if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
             value = Cchild[i+2]
@@ -246,7 +258,8 @@ def run(head: Node, vo_nout=False):
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
-                stack.append((i+3, Cchild))
+                stack.append((i+3, Cchild, 'if'))
+                debug_trace()
                 Cchild = IfBody.children
                 i = -1
             else:
@@ -262,7 +275,12 @@ def run(head: Node, vo_nout=False):
         elif Cchild[i].value == "print":
             t = ""
             for j in Cchild[i + 1].children:
-                t += j.value.replace('"', '')
+                #if Cchild[i+1].children[j].value == '$':
+                #    t += variables[Cchild[i+1].children[j+1].value].replace('"','')
+                #    # use enumerate for ^
+                #    j += 1
+                #else:
+                    t += j.value.replace('"', '')
             if not vo_nout:
                 print(t)
             i += 1
@@ -313,7 +331,7 @@ def parse_flags(args): # parse_flags
             flag.append(arg[1])
     return [True, flag]
 
-if __name__ == "__main__":
+def main():
     flags: list[bool, list[str]] = [False, []]
     if len(sys.argv) < 2:
         raise Exception("Deficient arguments. Try --help?")
@@ -322,6 +340,7 @@ if __name__ == "__main__":
 
     if "--help" in flags[1] or "-h" in flags[1]:
         print(readf("help.txt")) # DUDE... what if we made a man page for this?
+        #if you can make man page, then do it -firelabs
         exit()
 
     program = readf(sys.argv[1])
@@ -333,6 +352,7 @@ if __name__ == "__main__":
 
     ast = parse(tokens)
 
+    flag = {}
     if "--vopt syntaxt" in flags[1] or "-v" in flags[1]:
         print_ast(ast)
     if "--vopt syfl" in flags[1] or "-v" in flags[1]:
@@ -341,4 +361,12 @@ if __name__ == "__main__":
         run(ast, True)
     else:
         run(ast)
+    if '--nout' in flags[1]:
+        flag['nout'] = True
+    if '--de' in flags[1]:
+        flag['debugtrack'] = True
+        flag['nout'] = True # has to be, please edit so its better
+    run(ast, flag)
 
+if __name__ == '__main__':
+    main()
