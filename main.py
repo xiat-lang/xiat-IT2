@@ -36,7 +36,11 @@ def lexer(program):
         elif ch == ';': # match case from here?
             return ("SEMI", ch)
         elif ch == '=':
-            return ("EQUAL", ch)
+<<<<<<< HEAD
+            return ('SIGN', ch)
+=======
+            return ("SIGN", ch)
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
         elif ch == '$':
             return ("VARPTR", ch)
         elif ch == '+':
@@ -135,7 +139,11 @@ def parse(tokens):
         elif kind == "BLOCKCLOSE":
             current = stack.pop()
 
-        elif kind == "EQUAL":
+<<<<<<< HEAD
+        elif kind == 'EQ':
+=======
+        elif kind == "EQ":
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
             i += 1
             kind, char = tokens[i][0], tokens[i][1]
             if kind == "ALNUM":
@@ -162,7 +170,11 @@ def parse(tokens):
         #         continue
         #     i += 1
         #     kind, char = tokens[i][0], tokens[i][1]
-        #     if kind == "EQUAL":
+<<<<<<< HEAD
+        #     if kind == 'EQ':
+        #         new_node = Node('SETVAR', char)
+=======
+        #     if kind == "EQ":
         #         new_node = Node("SETVAR", char)
         #         current.children.append(new_node)
         #         stack.append(current)
@@ -190,7 +202,18 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head: Node, vo_nout = False, extra: dict[str, bool] = {}):
+<<<<<<< HEAD
+def run(head, extra={}):
+    variables = {}
+    localvar = {}
+    functions = {}
+    i = 0
+    stack = [(len(head.children)-3, head.children, 'HEAD')]
+    Cchild = head.children
+    
+    def evalcomp(N):
+=======
+def run(head: Node, vo_nout=False, extra={}):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
     stack: list[(int, Node, str)] = [(len(head.children)-3, head.children, "HEAD")] # (index, children, context)
@@ -210,13 +233,18 @@ def run(head: Node, vo_nout = False, extra: dict[str, bool] = {}):
         
             if kind == "VARPTR":
                 t.append(variables[N[j+1].value])
-
-            elif kind == "EQUAL" and nxkind == "EQUAL":
+                
+            elif kind == "SIGN" and nxkind == "SIGN":
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
                 a, b = t.pop(), N[j+2].value
                 t.append(a == b)
                 j += 2
                 
-            elif kind == "EQUAL" and nxkind == "SUBT": # =- ???
+<<<<<<< HEAD
+            elif kind == 'SIGN' and nxkind == 'SUBT':
+=======
+            elif kind == "SIGN" and nxkind == "SUBT": # =- ???
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
                 a, b = t.pop(), N[j+2].value
                 t.append(a != b)
                 j += 2
@@ -236,22 +264,54 @@ def run(head: Node, vo_nout = False, extra: dict[str, bool] = {}):
     
     def print_stack(stack: list[(int, Node, str)]):
         for i in stack:
-            print(f"{'-' * 14}\n{i[0]:<5}: {i[2]}")
-            
+            print("--------------")
+            print(f" {i[0]}:{i[2]}")
+<<<<<<< HEAD
+    def print_var(varibles, Localvar, current):
+        print('-- var --')
+        for v in varibles:
+            print(f'{v} {variables[v]}')
+        for lv in Localvar:
+            print(f'{current}: {lv} {Localvar[lv]}');
+=======
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
     def debug_trace():
-        if not "debugtrack" in extra:
-            pass
-        while True:
-            print_stack(stack)
-            p = input()
-            if p == "i":
-                break
-            print("\033[2J\033[H")
+        if 'debugtrack' in extra:
+                while True:
+                    print_stack(stack)
+<<<<<<< HEAD
+                    print_var(variables, localvar, stack[-1][0])
+=======
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
+                    p = input()
+                    if p == 'i':
+                        break
+                    print("\033[2J\033[H")
+<<<<<<< HEAD
+                for v in variables:
+                    print(f'{v} {variables[v]}')
+    def Parse_value(head, body):
+        if head.value != '[': return head.value
+        tmp = []
+        t = []
+        for val in body:
+            if val.type == 'SEMI':
+                tmp.append(t)
+                t = []
+            else:
+                t.append(val)
+        N = Node('VAR', 'ARPRR')
+        N.children = tmp
+        return N
     debug_trace()
-    
     while i < len(Cchild):
-        print(len(Cchild), i)
-        if Cchild[i].type == "EQUAL":
+        
+=======
+    debug_trace()
+    while i < len(Cchild):
+    
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
+        if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
             value = Cchild[i+2]
             variables[name.value] = value.value
@@ -261,7 +321,11 @@ def run(head: Node, vo_nout = False, extra: dict[str, bool] = {}):
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
-                stack.append((i+3, Cchild, "if"))
+<<<<<<< HEAD
+                stack.append((i+3, Cchild, 'if', localvar))
+=======
+                stack.append((i+3, Cchild, 'if'))
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
                 debug_trace()
                 Cchild = IfBody.children
                 i = -1
@@ -316,7 +380,8 @@ def run(head: Node, vo_nout = False, extra: dict[str, bool] = {}):
 
         i += 1
         if i >= len(Cchild) and len(stack) > 0:
-            i, Cchild, _ = stack.pop()
+            i, Cchild = stack.pop()
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
 
 def parse_flags(args): # parse_flags
     flag = []
@@ -364,12 +429,15 @@ def main():
         run(ast, True)
     else:
         run(ast)
-    if "--nout" in flags[1]:
-        flag["nout"] = True
-    if "--de" in flags[1] or "-g" in flags[1]:
-        flag["debugtrack"] = True
-        flag["nout"] = True # has to be, please edit so its better
+>>>>>>> parent of 4b29cf3 (Tried to fix merge)
+    if '--nout' in flags[1]:
+        flag['nout'] = True
+    if '--de' in flags[1]:
+        flag['debugtrack'] = True
+        flag['nout'] = True # has to be, please edit so its better
     run(ast, flag)
 
-if __name__ == "__main__":
+<<<<<<< HEAD
+=======
+if __name__ == '__main__':
     main()
