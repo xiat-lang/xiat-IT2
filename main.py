@@ -15,6 +15,8 @@ class Node:
         self.children.append(child)
     def pop(self):
         return self.children.pop()
+    def __repr__(self):
+        return f"{self.type} {self.value} {self.children}"
 
 def lexer(program):
     global i
@@ -36,11 +38,7 @@ def lexer(program):
         elif ch == ';': # match case from here?
             return ("SEMI", ch)
         elif ch == '=':
-<<<<<<< HEAD
-            return ('SIGN', ch)
-=======
             return ("SIGN", ch)
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
         elif ch == '$':
             return ("VARPTR", ch)
         elif ch == '+':
@@ -139,11 +137,7 @@ def parse(tokens):
         elif kind == "BLOCKCLOSE":
             current = stack.pop()
 
-<<<<<<< HEAD
-        elif kind == 'EQ':
-=======
         elif kind == "EQ":
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
             i += 1
             kind, char = tokens[i][0], tokens[i][1]
             if kind == "ALNUM":
@@ -170,10 +164,6 @@ def parse(tokens):
         #         continue
         #     i += 1
         #     kind, char = tokens[i][0], tokens[i][1]
-<<<<<<< HEAD
-        #     if kind == 'EQ':
-        #         new_node = Node('SETVAR', char)
-=======
         #     if kind == "EQ":
         #         new_node = Node("SETVAR", char)
         #         current.children.append(new_node)
@@ -194,7 +184,7 @@ def print_ast(head, ind=0):
     if head.type != "BLOCK":
         print("->" * ind, (head.type, head.value))
     for c in head.children:
-        print_ast(c, ind + 2)
+        print_ast(c, ind + 1)
 
 def print_flat(head):
     if head.type != "BLOCK":
@@ -202,17 +192,6 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-<<<<<<< HEAD
-def run(head, extra={}):
-    variables = {}
-    localvar = {}
-    functions = {}
-    i = 0
-    stack = [(len(head.children)-3, head.children, 'HEAD')]
-    Cchild = head.children
-    
-    def evalcomp(N):
-=======
 def run(head: Node, vo_nout=False, extra={}):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
@@ -235,16 +214,11 @@ def run(head: Node, vo_nout=False, extra={}):
                 t.append(variables[N[j+1].value])
                 
             elif kind == "SIGN" and nxkind == "SIGN":
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
                 a, b = t.pop(), N[j+2].value
                 t.append(a == b)
                 j += 2
                 
-<<<<<<< HEAD
-            elif kind == 'SIGN' and nxkind == 'SUBT':
-=======
             elif kind == "SIGN" and nxkind == "SUBT": # =- ???
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
                 a, b = t.pop(), N[j+2].value
                 t.append(a != b)
                 j += 2
@@ -266,32 +240,29 @@ def run(head: Node, vo_nout=False, extra={}):
         for i in stack:
             print("--------------")
             print(f" {i[0]}:{i[2]}")
-<<<<<<< HEAD
-    def print_var(varibles, Localvar, current):
+            
+    def print_var(variables, localvar, current):
         print('-- var --')
-        for v in varibles:
+        for v in variables:
             print(f'{v} {variables[v]}')
-        for lv in Localvar:
-            print(f'{current}: {lv} {Localvar[lv]}');
-=======
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
+        for lv in localvar:
+            print(f'{current}: {lv} {localvar[lv]}')
+            
     def debug_trace():
         if 'debugtrack' in extra:
                 while True:
                     print_stack(stack)
-<<<<<<< HEAD
-                    print_var(variables, localvar, stack[-1][0])
-=======
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
+                    print_var(variables, stack[-1][0])
                     p = input()
                     if p == 'i':
                         break
-                    print("\033[2J\033[H")
-<<<<<<< HEAD
+                    #// print("\033[2J\033[H")
                 for v in variables:
                     print(f'{v} {variables[v]}')
-    def Parse_value(head, body):
-        if head.value != '[': return head.value
+                    
+    def parse_value(head: Node, body: list[Node]) -> Node:
+        if head.value != '[': # TODO: docs.md has to reflect this, bro. I'm kinda confused.
+            return head # ? this was head.value. maybe make a node out of the string?
         tmp = []
         t = []
         for val in body:
@@ -300,17 +271,13 @@ def run(head: Node, vo_nout=False, extra={}):
                 t = []
             else:
                 t.append(val)
-        N = Node('VAR', 'ARPRR')
+        N = Node('VAR', 'ARPRR') # VARPTR?
         N.children = tmp
         return N
+    
     debug_trace()
     while i < len(Cchild):
         
-=======
-    debug_trace()
-    while i < len(Cchild):
-    
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
         if Cchild[i].type == 'SIGN':
             name = Cchild[i+1]
             value = Cchild[i+2]
@@ -321,11 +288,7 @@ def run(head: Node, vo_nout=False, extra={}):
             IfHead = Cchild[i+1]
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
-<<<<<<< HEAD
-                stack.append((i+3, Cchild, 'if', localvar))
-=======
-                stack.append((i+3, Cchild, 'if'))
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
+                stack.append((i+3, Cchild, 'if'))#, localvar))
                 debug_trace()
                 Cchild = IfBody.children
                 i = -1
@@ -380,8 +343,7 @@ def run(head: Node, vo_nout=False, extra={}):
 
         i += 1
         if i >= len(Cchild) and len(stack) > 0:
-            i, Cchild = stack.pop()
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
+            i, Cchild, _ = stack.pop()
 
 def parse_flags(args): # parse_flags
     flag = []
@@ -399,19 +361,19 @@ def parse_flags(args): # parse_flags
             flag.append(arg[1])
     return [True, flag]
 
-def main():
+def main(argv):
     flags: list[bool, list[str]] = [False, []]
-    if len(sys.argv) < 2:
+    if len(argv) < 2:
         raise Exception("Deficient arguments. Try --help?")
         
-    flags = parse_flags(sys.argv[1:])
+    flags = parse_flags(argv[1:])
 
     if "--help" in flags[1] or "-h" in flags[1]:
         print(readf("help.txt")) # DUDE... what if we made a man page for this?
         #if you can make man page, then do it -firelabs
         exit()
 
-    program = readf(sys.argv[1])
+    program = readf(argv[1])
     tokens = lexer(program)
 
     if "--vopt tokens" in flags[1] or "-v" in flags[1]:
@@ -425,19 +387,12 @@ def main():
         print_ast(ast)
     if "--vopt syfl" in flags[1] or "-v" in flags[1]:
         print_flat(ast)
-    if "--nout" in flags[1]:
-        run(ast, True)
-    else:
-        run(ast)
->>>>>>> parent of 4b29cf3 (Tried to fix merge)
     if '--nout' in flags[1]:
         flag['nout'] = True
-    if '--de' in flags[1]:
+    if '--de' in flags[1] or "-g" in flags[1]:
         flag['debugtrack'] = True
         flag['nout'] = True # has to be, please edit so its better
     run(ast, flag)
 
-<<<<<<< HEAD
-=======
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
