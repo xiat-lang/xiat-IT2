@@ -195,9 +195,10 @@ def print_flat(head):
 def run(head: Node, vo_nout=False, extra={}):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
-    stack: list[(int, Node, str)] = [(len(head.children)-3, head.children, "HEAD")] # (index, children, context)
+    stack: list[tuple[int, Node, str]] = [(len(head.children) - 3, head.children, "HEAD")] # (index, children, context)
     Cchild: list[Node] = head.children # current children
     i: int = 0 # item number of Cchild
+    # context: str = "HEAD" ?
 
     def evalcomp(N: list[Node]):
         j = 0
@@ -236,7 +237,7 @@ def run(head: Node, vo_nout=False, extra={}):
             j += 1
         return t.pop()
     
-    def print_stack(stack: list[(int, Node, str)]):
+    def print_stack(stack: list[tuple[int, Node, str]]):
         for i in stack:
             print("--------------")
             print(f" {i[0]}:{i[2]}")
@@ -249,16 +250,16 @@ def run(head: Node, vo_nout=False, extra={}):
             print(f'{current}: {lv} {localvar[lv]}')
             
     def debug_trace():
-        if 'debugtrack' in extra:
-                while True:
-                    print_stack(stack)
-                    print_var(variables, stack[-1][0])
-                    p = input()
-                    if p == 'i':
-                        break
-                    #// print("\033[2J\033[H")
-                for v in variables:
-                    print(f'{v} {variables[v]}')
+        global stack
+        while True:
+            print_stack(stack)
+            print_var(variables, stack[-1][0], stack[-1][2])
+            p = input()
+            if p == 'i':
+                break
+            #// print("\033[2J\033[H")
+        for v in variables:
+            print(f'{v} {variables[v]}')
                     
     def parse_value(head: Node, body: list[Node]) -> Node:
         if head.value != '[': # TODO: docs.md has to reflect this, bro. I'm kinda confused.
@@ -275,7 +276,9 @@ def run(head: Node, vo_nout=False, extra={}):
         N.children = tmp
         return N
     
-    debug_trace()
+    if 'debugtrack' in extra:
+        debug_trace()
+        
     while i < len(Cchild):
         
         if Cchild[i].type == 'SIGN':
