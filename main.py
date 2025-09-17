@@ -192,7 +192,7 @@ def print_flat(head):
     for c in head.children:
         print(c.type, c.value)
 
-def run(head: Node, vo_nout=False, extra={}):
+def run(head: Node, flags=set()):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
     stack: list[tuple[int, Node, str]] = [(len(head.children) - 3, head.children, "HEAD")] # (index, children, context)
@@ -257,8 +257,6 @@ def run(head: Node, vo_nout=False, extra={}):
             if p == 'i':
                 break
             #// print("\033[2J\033[H")
-        for v in variables:
-            print(f'{v} {variables[v]}')
                     
     def parse_value(head: Node, body: list[Node]) -> Node:
         if head.value != '[': # TODO: docs.md has to reflect this, bro. I'm kinda confused.
@@ -275,8 +273,8 @@ def run(head: Node, vo_nout=False, extra={}):
         N.children = tmp
         return N
     
-    #if 'debugtrack' in extra:
-    debug_trace()
+    if "debugtrack" in flags:
+        debug_trace()
         
     while i < len(Cchild):
         
@@ -312,7 +310,7 @@ def run(head: Node, vo_nout=False, extra={}):
                 #    j += 1
                 #else:
                     t += j.value.replace('"', '')
-            if not vo_nout:
+            if "nout" not in flags:
                 print(t)
             i += 1
 # <<<<<<< HEAD
@@ -360,7 +358,7 @@ def parse_flags(args): # parse_flags
                     flag.append(f"-{i}")
         else:
             flag.append(arg[1])
-    return [True, flag]
+    return flag
 
 def main(argv):
     flags: list[bool, list[str]] = [False, []]
@@ -369,7 +367,7 @@ def main(argv):
         
     flags = parse_flags(argv[1:])
 
-    if "--help" in flags[1] or "-h" in flags[1]:
+    if "--help" in flags or "-h" in flags:
         print(readf("help.txt")) # DUDE... what if we made a man page for this?
         #if you can make man page, then do it -firelabs
         exit()
@@ -377,22 +375,22 @@ def main(argv):
     program = readf(argv[1])
     tokens = lexer(program)
 
-    if "--vopt tokens" in flags[1] or "-v" in flags[1]:
+    if "--vopt tokens" in flags or "-v" in flags:
         for t in tokens:
             print(t)
 
     ast = parse(tokens)
 
-    flag = {}
-    if "--vopt syntaxt" in flags[1] or "-v" in flags[1]:
+    flagset = set() # can this block be merged into parse_flags?
+    if "--vopt syntaxt" in flags or "-v" in flags:
         print_ast(ast)
-    if "--vopt syfl" in flags[1] or "-v" in flags[1]:
+    if "--vopt syfl" in flags or "-v" in flags:
         print_flat(ast)
-    if '--nout' in flags[1]:
-        flag['nout'] = True
-    if '--de' in flags[1] or "-g" in flags[1]:
-        flag['debugtrack'] = True
-    run(ast, flag)
+    if "--nout" in flags:
+        flagset.add("nout")
+    if "--de" in flags or "-g" in flags:
+        flagset.add("debugtrack")
+    run(ast, flagset)
 
 if __name__ == '__main__':
     main(sys.argv)
