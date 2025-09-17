@@ -246,14 +246,13 @@ def run(head: Node, vo_nout=False, extra={}):
         print('-- var --')
         for v in variables:
             print(f'{v} {variables[v]}')
-        for lv in localvar:
-            print(f'{current}: {lv} {localvar[lv]}')
+        for lv in enumerate(localvar):
+            print(f'{current}: {lv[0]} {lv[1]}') # ? assumption
             
     def debug_trace():
-        global stack
         while True:
             print_stack(stack)
-            print_var(variables, stack[-1][0], stack[-1][2])
+            print_var(variables, list(zip(*stack))[0], list(zip(*stack))[2])
             p = input()
             if p == 'i':
                 break
@@ -276,8 +275,8 @@ def run(head: Node, vo_nout=False, extra={}):
         N.children = tmp
         return N
     
-    if 'debugtrack' in extra:
-        debug_trace()
+    #if 'debugtrack' in extra:
+    debug_trace()
         
     while i < len(Cchild):
         
@@ -292,7 +291,6 @@ def run(head: Node, vo_nout=False, extra={}):
             IfBody = Cchild[i+2]
             if evalcomp(IfHead.children):
                 stack.append((i+3, Cchild, 'if'))#, localvar))
-                debug_trace()
                 Cchild = IfBody.children
                 i = -1
             else:
@@ -394,7 +392,6 @@ def main(argv):
         flag['nout'] = True
     if '--de' in flags[1] or "-g" in flags[1]:
         flag['debugtrack'] = True
-        flag['nout'] = True # has to be, please edit so its better
     run(ast, flag)
 
 if __name__ == '__main__':
