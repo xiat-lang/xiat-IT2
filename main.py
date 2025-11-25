@@ -7,7 +7,7 @@ def readf(file):
         return f.read()
 
 class Node:
-    def __init__(self, type: str = None, value: str = None, initc: list = None):
+    def __init__(self, type: str, value: str, initc: list = []):
         self.type = type
         self.value = value
         self.children = initc if initc is not None else []
@@ -110,7 +110,7 @@ def lexer(program):
 
 
 def parse(tokens):
-    head = Node("ROOT", None)
+    head = Node("ROOT", "")
     # global current, stack
     stack: list[Node] = [head] # since we only use push & pop, this could be a node...
     current = stack[0]
@@ -195,14 +195,14 @@ def print_flat(head):
 def run(head: Node, flags=set()):
     variables: dict[str, str] = {}
     functions: dict[str, Node] = {}
-    stack: list[tuple[int, Node, str]] = [(len(head.children) - 3, head.children, "HEAD")] # (index, children, context)
+    stack: list[tuple[int, list[Node], str]] = [(len(head.children) - 3, head.children, "HEAD")] # (index, children, context)
     Cchild: list[Node] = head.children # current children
     i: int = 0 # item number of Cchild
     # context: str = "HEAD" ?
 
     def evalcomp(N: list[Node]):
         j = 0
-        t: list[str] = []
+        t: list = [] # ? is this a list of strings or just values?
         while j < len(N):
             kind = N[j].type
             if j + 1 < len(N):
@@ -216,12 +216,12 @@ def run(head: Node, flags=set()):
                 
             elif kind == "SIGN" and nxkind == "SIGN":
                 a, b = t.pop(), N[j+2].value
-                t.append(a == b)
+                t.append(str(a == b))
                 j += 2
                 
             elif kind == "SIGN" and nxkind == "SUBT": # =- ???
                 a, b = t.pop(), N[j+2].value
-                t.append(a != b)
+                t.append(str(a != b))
                 j += 2
                 
             elif kind == "LEFT":
@@ -233,11 +233,21 @@ def run(head: Node, flags=set()):
                 a, b = t.pop(), N[j+1].value
                 t.append(str(int(a) > int(b)))
                 j += 1
+            
+            elif kind == "PLUS":
+                a, b = t.pop(), N[j+1].value
+                t.append(str(int(a) + int(b)))
+                j += 1
+            
+            elif kind == "MINUS":
+                a, b = t.pop(), N[j+1].value
+                t.append(str(int(a) - int(b)))
+                j += 1
                 
             j += 1
         return t.pop()
     
-    def print_stack(stack: list[tuple[int, Node, str]]):
+    def print_stack(stack: list[tuple[int, list[Node], str]]):
         for i in stack:
             print("--------------")
             print(f" {i[0]}:{i[2]}")
@@ -331,11 +341,11 @@ def run(head: Node, flags=set()):
 # =======
 
         elif Cchild[i].value in functions: # TODO: make local variables possible
-            fcargs = functions[Cchild[i].value].children[0].children
-            fcbody = functions[Cchild[i].value].children[1].children
-            stack.append((i+2, Cchild))
-            Cchild = fcbody
-            for j, arg in enumerate(fcargs):
+            fcargs: Node = functions[Cchild[i].value].children[0]
+            fcbody: Node = functions[Cchild[i].value].children[1]
+            stack.append((i+2, Cchild, "FC")) # ! i don't know if the third arg is "FC"
+            Cchild = fcbody.children
+            for j, arg in enumerate(fcargs.children):
                 variables[arg.value] = Cchild[i+1].children[j].value
             i = -1
 # >>>>>>> parent of 2377218 (broke some things, but stack trace added)
@@ -361,7 +371,7 @@ def parse_flags(args): # parse_flags
     return flag
 
 def main(argv):
-    flags: list[bool, list[str]] = [False, []]
+    flags: list[str] = []
     if len(argv) < 2:
         raise Exception("Deficient arguments. Try --help?")
         

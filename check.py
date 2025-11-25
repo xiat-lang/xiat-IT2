@@ -4,7 +4,7 @@ import main
 
 exit_code = 0
 
-def test(command: str, expect: str, file: str = None):
+def test(command: list[str], expect: str, file: str):
     result = subprocess.run(command, capture_output=True, text=True)
     # assert result.stdout.strip() != expect.strip(), f"command: {file} dint match expected:\n{expect}\nbut got:\n{result.stdout}"
     if result.stdout.strip() != expect.strip():
@@ -20,21 +20,21 @@ but got:
     else:
         print(f"file {file} matched!")
         
-def test2(file: str, expect: str): # uses import module main
-    argv = ["main.py", file, "--nout", "--vopt", "tokens"]
-    result = main.main(argv) # until it can return something useful, this can't be used
-    if result.strip() != expect.strip():
-        print(f"""
-command: {file}
-was expected to match:
-{expect}
-but got:
-{result}"""
-        , file=sys.stderr)
-        global exit_code
-        exit_code = 1
-    else:
-        print(f"file {file} matched!")
+# def test2(file: str, expect: str): # uses import module main
+#     argv = ["main.py", file, "--nout", "--vopt", "tokens"]
+#     result = main.main(argv) # until it can return something useful, this can't be used
+#     if result.strip() != expect.strip():
+#         print(f"""
+# command: {file}
+# was expected to match:
+# {expect}
+# but got:
+# {result}"""
+#         , file=sys.stderr)
+#         global exit_code
+#         exit_code = 1
+#     else:
+#         print(f"file {file} matched!")
 
 if __name__ == '__main__':    
     # python3 main.py test/lexer.xiat --nout --vopt tokens
